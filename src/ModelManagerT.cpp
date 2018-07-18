@@ -11,28 +11,10 @@ using namespace MPM;
 
 ModelManagerT::ModelManagerT()
 {
-	fDT=0;
-	fNumStep=1;
-	fNQ=6;
-
-	fSD=3;
-	fIfExt=1;
-	fNND=0;
-	fENND=0;
-	fNEL=0;
-	fET=1;
-	fIEN=NULL;
-	fCoords=NULL;
-
-	fE=0;
-	fNu=0;
-	fDensity=0;
 }
 
 ModelManagerT::~ModelManagerT()
 {
-	if (fIEN) delete[] fIEN;
-	if (fCoords) delete[] fCoords;
 }
 
 
@@ -150,20 +132,6 @@ void ModelManagerT::SetCoords(double* coords)
 
 }
 
-void ModelManagerT::GetMaterialConstants(double& E, double& nu, double& rho)
-{
-	E=fE;
-	nu=fNu;
-	rho=fDensity;
-}
-
-void ModelManagerT::SetMaterialConstants(double E, double nu, double rho)
-{
-	fE=E;
-	fNu=nu;
-	fDensity=rho;
-}
-
 
 void ModelManagerT::ReadInput(const char* name)
 {
@@ -171,6 +139,8 @@ void ModelManagerT::ReadInput(const char* name)
     
     fNumStep=fInput.getNumStep();
     fDT=fInput.getTimeStepSize();
+    
+    
     
     fInput.~InputT();
 }

@@ -1,6 +1,5 @@
 /* created by Xiaoyong Bai at CU Boulder, 07/17/2018 */
 
-
 #include "InputT.h"
 
 #include <fstream>
@@ -8,11 +7,8 @@
 #include "stdio.h"
 #include "stdlib.h"
 
-
 using namespace std;
 using namespace MPM;
-
-
 
 InputT::InputT()
 {
