@@ -11,7 +11,6 @@ void recordTime();
 
 int main(int argc, char **args){
 
-cout << "ll"<< endl;
     recordTime();
     
     if(argc == 1){
