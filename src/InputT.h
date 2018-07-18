@@ -26,6 +26,8 @@ public:
 
     double getTimeStepSize(void){return fDT;}; //get time step size
     
+    unordered_map<int, string>* getMatNameTable(void){return &fMatNames;};
+    
 private:
     
     /*time step parameters*/
