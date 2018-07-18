@@ -1,16 +1,11 @@
-/*
- * ModelManagerT.h
- *
- *  Created on: May 28, 2015
- *      Author: xiaoyong
- */
+/* created by Xiaoyong Bai at CU Boulder, 07/17/2018 */
 
 #ifndef MODELMANAGERT_H_
 #define MODELMANAGERT_H_
 
 #include "InputT.h"
 
-namespace TD_BEM{
+namespace MPM{
 
 
 class ModelManagerT

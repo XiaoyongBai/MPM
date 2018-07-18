@@ -1,18 +1,12 @@
-/*
- * ModelManagerT.cpp
- *
- *  Created on: May 28, 2015
- *      Author: xiaoyong
- */
+/* created by Xiaoyong Bai at CU Boulder, 07/17/2018 */
+
 
 #include "ModelManagerT.h"
-#include "MathOperationT.h"
 
 #include <iostream>
 
 using namespace std;
-using namespace TD_BEM;
-using namespace GreenFunction;
+using namespace MPM;
 
 
 ModelManagerT::ModelManagerT()
@@ -141,7 +135,6 @@ void ModelManagerT::SetIEN(int* IEN)
     
 	fIEN=new int[fNEL*fENND];
 
-	MathOperationT::MemCopy(fNEL*fENND, IEN, fIEN);
 }
 
 const double* ModelManagerT::GetCoords(void)
@@ -155,7 +148,6 @@ void ModelManagerT::SetCoords(double* coords)
     
 	fCoords=new double[fNND*fSD];
 
-	MathOperationT::MemCopy(fNND*fSD, coords, fCoords);
 }
 
 void ModelManagerT::GetMaterialConstants(double& E, double& nu, double& rho)
@@ -176,24 +168,9 @@ void ModelManagerT::SetMaterialConstants(double E, double nu, double rho)
 void ModelManagerT::ReadInput(const char* name)
 {
 	fInput.ReadInput(name);
-
-	SetNumStep(fInput.GetNumStep());
-	SetDT(fInput.GetDT());
-	SetNQ(fInput.GetNQ());
-
-    SetIfExt(fInput.GetIfExt());
     
-	SetNND(fInput.GetNND());
-	SetElementType(fInput.GetElementType());
-	SetNEL(fInput.GetNEL());
-
-	SetIEN(fInput.GetIEN());
-
-	SetCoords(fInput.GetCoords());
-
-	double E, nu, rho;
-	fInput.GetMaterialConstants(E, nu, rho);
-	SetMaterialConstants(E, nu, rho);
-
-
+    fNumStep=fInput.getNumStep();
+    fDT=fInput.getTimeStepSize();
+    
+    fInput.~InputT();
 }
