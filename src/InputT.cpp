@@ -60,6 +60,10 @@ void InputT::ReadInput(const char* fileName)
             fMatConstants[id].push_back(para);
         }
         
+        for (int k=0; k<fMatConstants[id].size(); k++) {
+            cout << fMatConstants[id][k]<<endl;
+        }
+        
     }
     
 

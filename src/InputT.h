@@ -27,6 +27,7 @@ public:
     double getTimeStepSize(void){return fDT;}; //get time step size
     
     unordered_map<int, string>* getMatNameTable(void){return &fMatNames;};
+    unordered_map<int, vector<double>>* getMatParaTable(void){return &fMatConstants;};
     
 private:
     
@@ -41,6 +42,12 @@ private:
     unordered_map<int, string> fMatNames;
     unordered_map<int, vector<double>> fMatConstants;
 
+    /*Elements for material points*/
+    
+    int fNumGroup; //number of element groups
+    vector<vector<int>> elementConstants; //algorithmical constants for elelement groups
+    vector<int* >
+    
     
 };
 
