@@ -29,6 +29,10 @@ public:
     unordered_map<int, string>* getMatNameTable(void){return &fMatNames;};
     unordered_map<int, vector<double>>* getMatParaTable(void){return &fMatConstants;};
     
+    vector<vector<int>> getElementConstants(void){return fElementConstants;};
+    vector<int*> getIENs(void){return fIENs;};
+    vector<vector<double>> getNodes(void){return fNodes;};
+    
 private:
     
     /*time step parameters*/
@@ -45,10 +49,11 @@ private:
     /*Elements for material points*/
     
     int fNumGroup; //number of element groups
-    vector<vector<int>> elementConstants; //algorithmical constants for elelement groups
-    vector<int* >
+    vector<vector<int>> fElementConstants; //algorithmical constants for elelement groups
+    vector<int*> fIENs; //Element connectivities
     
-    
+    int fNumNodes;
+    vector<vector<double>> fNodes; //Nodes' coordiantes
 };
 
 

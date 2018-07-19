@@ -19,6 +19,10 @@ InputT::InputT()
 InputT::~InputT()
 {
     cout << "InputT is destroyed\n";
+    
+    for (int i=0; i<fIENs.size(); i++) {
+        delete [] fIENs[i];
+    }
 }
 
 void InputT::ReadInput(const char* fileName)
@@ -59,16 +63,49 @@ void InputT::ReadInput(const char* fileName)
             fin>>para;
             fMatConstants[id].push_back(para);
         }
-        
-        for (int k=0; k<fMatConstants[id].size(); k++) {
-            cout << fMatConstants[id][k]<<endl;
-        }
-        
     }
     
 
     /* read Element groups */
+    fin >> fNumGroup;
     
+    fElementConstants=vector<vector<int>> (fNumGroup, vector<int>(5,0));
+    fIENs=vector<int*>(fNumGroup, NULL);
+    
+    for (int i=0; i<fNumGroup; i++) {
+        int numElements; fin>>numElements;
+        int eleType; fin>>eleType; //element type
+        int eleNND; fin>>eleNND; //number of nodes per element
+        int mat_id; fin>>mat_id; //id of the material
+        int num_mp; fin>>num_mp; //number of material points per element
+        
+        fElementConstants[i][0]=numElements;
+        fElementConstants[i][1]=eleType;
+        fElementConstants[i][2]=eleNND;
+        fElementConstants[i][3]=mat_id;
+        fElementConstants[i][4]=num_mp;
+        
+        //allocate memory for IEN
+        fIENs[i] = new int[numElements*eleNND];
+        
+        for (int j=0; j<numElements; j++) {
+            for (int k=0; k<eleNND; k++) {
+                fin>>fIENs[i][j*eleNND+k];
+                fIENs[i][j*eleNND+k]-=1;
+            }
+        }
+        
+    }
+    
+    /* read Nodes' coordinates */
+    fin>>fNumNodes;
+    fNodes=vector<vector<double>>(fNumNodes, vector<double>(3,0));
+    
+    for (int i=0; i<fNumNodes; i++) {
+        for (int j=0; j<3; j++) {
+            fin>>fNodes[i][j];
+        }
+    }
     
     fin.close();
     

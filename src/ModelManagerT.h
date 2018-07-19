@@ -19,19 +19,21 @@ public:
     int GetNumStep(void){return fNumStep;};
     double GetDT(void){return fDT;};
 
-
 	void ReadInput(const char* name);
 
     void ConstructMaterialTable(void);
 
 private:
-	/**
-	 * algorithm parameters
-	 */
+    
+	/* algorithm parameters */
 	double fDT;
 	int fNumStep;
-	int fNQ;
 
+    /* Element to create Material Points */
+    int fNumGroups_mp;
+    vector<vector<int>> fElementConstants_mp; //algorithmical constants for elelement groups
+    vector<int*> fIENs_mp; //Element connectivities
+    vector<vector<double>> fNodes_mp; //Nodal coordiantes
     
 	InputT fInput;
     

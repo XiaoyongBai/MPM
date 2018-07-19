@@ -1,9 +1,9 @@
 /* created by Xiaoyong Bai at CU Boulder, 07/17/2018 */
 
+#include <iostream>
 
 #include "ModelManagerT.h"
-
-#include <iostream>
+#include "ShapeBaseT.h"
 
 using namespace std;
 using namespace MPM;
@@ -25,8 +25,22 @@ void ModelManagerT::ReadInput(const char* name)
     fNumStep=fInput.getNumStep();
     fDT=fInput.getTimeStepSize();
     
-    /* setup materials */
+    /* set up materials */
     ConstructMaterialTable();
+    
+    /* set up nodes */
+    fNodes_mp=fInput.getNodes();
+    
+    /* set up elements and generate material points */
+    vector<vector<int>> elementConstants = fInput.getElementConstants();
+    int ele_type=elementConstants[0][1];
+    ShapeBaseT* shape = ShapeBaseT::create(ele_type);
+    shape->setCoord(&fNodes_mp);
+    vector<double> xi={0,-1,1};
+    shape->evaluate(xi);
+    
+    vector<double> X=shape->getX();
+    double J=shape->getJ();
     
     fInput.~InputT();
 }
