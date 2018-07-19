@@ -28,14 +28,14 @@ int main(int argc, char **args){
     ModelManagerT* model = new ModelManagerT();
     
     try{
-        model->ReadInput(args[1]);
+        model->readInput(args[1]);
     }catch(const char* msg){
         cerr<<msg<<endl;
         return 0;
     }
     
-    int numStep=model->GetNumStep();
-    double time_step = model->GetDT();
+    int numStep=model->getNumStep();
+    double time_step = model->getDT();
     
     recordTime();
     

@@ -16,13 +16,16 @@ public:
 	ModelManagerT();
 	~ModelManagerT();
 
-    int GetNumStep(void){return fNumStep;};
-    double GetDT(void){return fDT;};
+    int getNumStep(void){return fNumStep;};
+    double getDT(void){return fDT;};
 
-	void ReadInput(const char* name);
+	void readInput(const char* name);
 
-    void ConstructMaterialTable(void);
-
+    void constructMaterialTable(void);
+    
+    void generateMPM(void);
+    
+    
 private:
     
 	/* algorithm parameters */
@@ -31,7 +34,7 @@ private:
 
     /* Element to create Material Points */
     int fNumGroups_mp;
-    vector<vector<int>> fElementConstants_mp; //algorithmical constants for elelement groups
+    vector<vector<int>> fElementConstants_mp; //algorithmical constants for element groups
     vector<int*> fIENs_mp; //Element connectivities
     vector<vector<double>> fNodes_mp; //Nodal coordiantes
     
