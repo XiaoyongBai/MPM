@@ -1,2 +1,2 @@
 # MPM
-A material point method for solid/fluid mechanics with large deformation.
+A code of material point method for solid/fluid mechanics with large deformation.
