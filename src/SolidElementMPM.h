@@ -26,7 +26,13 @@ public:
     /* returns coordiante and volume of each material point */
     vector<vector<double>> generateMatPoints(int num_mp);
     
+    void setMaterialPoints(vector<MaterialPointT*>* mp, vector<int>& index);
+    
+    //compute the shape coordinates of the material point
+    void computeMPShapeCoord(void);
  
+    void compute(void);
+    
 };
     
     

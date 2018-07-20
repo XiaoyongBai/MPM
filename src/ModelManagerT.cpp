@@ -148,8 +148,15 @@ void ModelManagerT::generateBackgroundMesh(vector<double> range, double esize){
                 
                 fIEN_bkg.push_back({id, id+1, id+1+nnd_x, id+nnd_x,
                     id+nnd_layer, id+1+nnd_layer, id+1+nnd_x+nnd_layer, id+nnd_x+nnd_layer});
+                
+                fElementCoord_bkg.push_back({fNodes_bkg[id], fNodes_bkg[id+1], fNodes_bkg[id+1+nnd_x],
+                    fNodes_bkg[id+nnd_x],fNodes_bkg[id+nnd_layer], fNodes_bkg[id+1+nnd_layer],
+                    fNodes_bkg[id+1+nnd_x+nnd_layer], fNodes_bkg[id+nnd_x+nnd_layer]});
+                
             }
         }
+        
+        
         
     }
     
@@ -250,8 +257,6 @@ void ModelManagerT::constructElementMPTable(void){
         
         fBKG_Element_MP_table[eid].push_back(ni);
     }
-    
-    cout << "table is constructed \n";
-    
+        
     
 }

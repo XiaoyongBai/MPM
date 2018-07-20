@@ -18,6 +18,8 @@ public:
     ShapeBaseT();
     ~ShapeBaseT();
     
+    int getENND(){return fNND;};
+    
     //set up the nodal coordiantes
     void setCoord(vector<vector<double>>* coord){fCoords=coord;};
     

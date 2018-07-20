@@ -26,7 +26,9 @@ private:
     
     ElementBaseT* fElement;
     
-    
+    /* infos of background mesh */
+    vector<vector<int>>* fIEN;
+    vector<vector<vector<double>>>* fElementCoord;
     
 };
     

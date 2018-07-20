@@ -20,8 +20,15 @@ public:
 
     int getNumStep(void){return fNumStep;};
     double getDT(void){return fDT;};
-
+    
+    vector<vector<int>>* getIEN_bkg(void){return &fIEN_bkg;};
+    vector<vector<double>>* getNodes_bkg(void){return &fNodes_bkg;};
+    vector<vector<vector<double>>>* getElementCoord_bkg(){return &fElementCoord_bkg;};
+    
     vector<MaterialPointT*>* getMatPts(void){return &fMatPts;};
+    
+    vector<vector<int>>* getElementMP_table(){return &fBKG_Element_MP_table;};
+    
     
 	void readInput(const char* name);
 
@@ -55,7 +62,7 @@ private:
     
     vector<vector<int>> fIEN_bkg;
     vector<vector<double>> fNodes_bkg;
-    
+    vector<vector<vector<double>>> fElementCoord_bkg; //coordinates of nodes for each element
     
     /* Element to create Material Points */
     int fNumGroups_mp;

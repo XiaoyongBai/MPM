@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "ShapeBaseT.h"
-
+#include "MaterialPointT.h"
 
 using namespace std;
 
@@ -23,9 +23,14 @@ public:
     
     void setNodeCoord(vector<vector<double>>& coord){fNodeCoord=coord;};
 
+    virtual void setMaterialPoints(vector<MaterialPointT*>* mp, vector<int>& index){;};
+    
     /* generate material points */
     /* returns coordiante and volume of each material point */
     virtual vector<vector<double>> generateMatPoints(int num_mp){return {};};
+    
+
+    virtual void compute(void)=0;
     
 public:
     
@@ -37,7 +42,18 @@ protected:
     vector<vector<double>> fNodeCoord;
     vector<vector<double>> fNodeVelo;
     
+    
     ShapeBaseT* fShape;
+    
+    /* Material Point infos */
+    vector<MaterialPointT*>* fMP; //all material points in the model
+    vector<int> fMP_index; //material points in this element
+    vector<vector<double>> fMP_ShapeCoord; //shape coordinates of material points
+    
+    /* results */
+    vector<double> fMassMatrix;
+    vector<double> fForce;
+    
 };
     
     
