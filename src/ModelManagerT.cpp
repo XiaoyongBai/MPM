@@ -95,38 +95,38 @@ void ModelManagerT::generateBackgroundMesh(vector<double> range, double esize){
     fIEN_bkg.clear();
     fNodes_bkg.clear();
     
-    double x_left=range[0];
-    double x_right=range[1];
-    double y_left=range[0];
-    double y_right=range[1];
-    double z_left=range[0];
-    double z_right=range[1];
+    fx_left=range[0];
+    fx_right=range[1];
+    fy_left=range[0];
+    fy_right=range[1];
+    fz_left=range[0];
+    fz_right=range[1];
     
-    double x_length=x_right-x_left;
-    double y_length=y_right-y_left;
-    double z_length=z_right-z_left;
+    double x_length=fx_right-fx_left;
+    double y_length=fy_right-fy_left;
+    double z_length=fz_right-fz_left;
     
-    int nel_x = ceil(x_length/esize);
-    int nel_y = ceil(y_length/esize);
-    int nel_z = ceil(z_length/esize);
+    fx_nel = ceil(x_length/esize);
+    fy_nel = ceil(y_length/esize);
+    fz_nel = ceil(z_length/esize);
     
-    int nnd_x = nel_x+1;
-    int nnd_y = nel_y+1;
-    int nnd_z = nel_z+1;
+    int nnd_x = fx_nel+1;
+    int nnd_y = fy_nel+1;
+    int nnd_z = fz_nel+1;
     
-    double inc_x = x_length/(nel_x+0.0);
-    double inc_y = y_length/(nel_y+0.0);
-    double inc_z = z_length/(nel_z+0.0);
+    fx_inc = x_length/(fx_nel+0.0);
+    fy_inc = y_length/(fy_nel+0.0);
+    fz_inc = z_length/(fz_nel+0.0);
     
     //generate nodes
     for (int zi=0; zi<nnd_z; zi++) {
-        double z = zi*inc_z;
+        double z = zi*fz_inc;
         
         for (int yi=0; yi<nnd_y; yi++) {
-            double y = yi*inc_y;
+            double y = yi*fy_inc;
             
             for (int xi=0; xi<nnd_x; xi++) {
-                double x = xi*inc_x;
+                double x = xi*fx_inc;
                 
                 fNodes_bkg.push_back({x,y,z});
             }
@@ -136,13 +136,13 @@ void ModelManagerT::generateBackgroundMesh(vector<double> range, double esize){
     //generate elements
     int nnd_layer = nnd_x*nnd_y;
     
-    for (int zi=0; zi<nel_z; zi++) {
+    for (int zi=0; zi<fz_nel; zi++) {
         int z_offset = zi*nnd_layer;
         
-        for (int yi=0; yi<nel_y; yi++) {
+        for (int yi=0; yi<fy_nel; yi++) {
             int y_offset = yi*nnd_x;
             
-            for (int xi=0; xi<nel_x; xi++) {
+            for (int xi=0; xi<fx_nel; xi++) {
                 
                 int id=z_offset+y_offset+xi;
                 
@@ -153,8 +153,8 @@ void ModelManagerT::generateBackgroundMesh(vector<double> range, double esize){
         
     }
     
-    cout << "num element=" << fIEN_bkg.size() << endl;
-    
+    int nel = fIEN_bkg.size();
+    fBKG_Element_MP_table=vector<vector<int>>(nel, {});
 
 }
 
@@ -217,6 +217,41 @@ void ModelManagerT::generateMPs(){
         
         
     }
+    
+}
+
+
+
+
+void ModelManagerT::constructElementMPTable(void){
+    
+    //clear the table
+    int nel=fBKG_Element_MP_table.size();
+    for (int i=0; i<nel; i++) {
+        fBKG_Element_MP_table[i].clear();
+    }
+    
+    
+    int nmp = fMatPts.size(); //number of material points
+    
+    for (int ni=0; ni<nmp; ni++) {
+        
+        vector<double> coord = fMatPts[ni]->getCoord();
+        
+        if (coord[0]>fx_right || coord[0]<fx_left || coord[1]>fy_right || coord[1]<fy_left
+            || coord[2]>fz_right || coord[2]<fz_left) continue;  //material point is out of range
+        
+        
+        int x_index = floor( (coord[0]-fx_left)/fx_inc );
+        int y_index = floor( (coord[1]-fy_left)/fy_inc );
+        int z_index = floor( (coord[2]-fz_left)/fz_inc );
+        
+        int eid = z_index*(fx_nel*fy_nel) + y_index*fx_nel + x_index;
+        
+        fBKG_Element_MP_table[eid].push_back(ni);
+    }
+    
+    cout << "table is constructed \n";
     
     
 }

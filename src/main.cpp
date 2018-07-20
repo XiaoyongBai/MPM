@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "ModelManagerT.h"
+#include "ExplicitTransient.h"
 
 using namespace std;
 using namespace MPM;
@@ -34,8 +35,16 @@ int main(int argc, char **args){
         return 0;
     }
     
-    int numStep=model->getNumStep();
-    double time_step = model->getDT();
+    
+    ExplicitTransient  ET(model);
+    
+    try {
+        ET.drive();
+    } catch (const char* msg) {
+        cerr<<msg<<endl;
+        return 0;
+    }
+    
     
     recordTime();
     

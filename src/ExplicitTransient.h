@@ -17,6 +17,9 @@ public:
     ExplicitTransient(ModelManagerT* model);
     ~ExplicitTransient();
     
+    
+    void drive(void);
+    
 private:
     
     ModelManagerT* fModel;

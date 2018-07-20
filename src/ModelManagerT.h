@@ -30,15 +30,33 @@ public:
     void generateBackgroundMesh(void);
     void generateBackgroundMesh(vector<double> range, double esize);
     
+    /* generate material points using the input finite elements and materials */
     void generateMPs(void);
     
+    /* For each background element, determine the material points that it contiains */
+    void constructElementMPTable(void);
     
 private:
+    
+    /* read input */
+    InputT fInput;
     
 	/* algorithm parameters */
 	double fDT;
 	int fNumStep;
-
+    
+    /* Material table */
+    unordered_map<int, MaterialBaseT*> fMatTables;
+    
+    /* Background mesh */
+    double fx_left, fx_right, fy_left, fy_right, fz_left, fz_right; //range of the background mesh
+    double fx_inc, fy_inc, fz_inc; //element size in each direction
+    int fx_nel, fy_nel, fz_nel; //number of elements in each direction
+    
+    vector<vector<int>> fIEN_bkg;
+    vector<vector<double>> fNodes_bkg;
+    
+    
     /* Element to create Material Points */
     int fNumGroups_mp;
     vector<vector<int>> fElementConstants_mp; //algorithmical constants for element groups
@@ -49,16 +67,9 @@ private:
     /* Material Points */
     vector<MaterialPointT*> fMatPts;
     
-    /* read input */
-	InputT fInput;
     
-    /* Material table */
-    unordered_map<int, MaterialBaseT*> fMatTables;
-    
-    /* Background mesh */
-    vector<vector<int>> fIEN_bkg;
-    vector<vector<double>> fNodes_bkg;
-    
+    /* Material points in each background mesh */
+    vector<vector<int>> fBKG_Element_MP_table;
     
 };
 

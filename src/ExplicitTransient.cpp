@@ -16,3 +16,19 @@ ExplicitTransient::ExplicitTransient(ModelManagerT* model){
 ExplicitTransient::~ExplicitTransient(){
     
 }
+
+void ExplicitTransient::drive(){
+    
+    int num_step = fModel->getNumStep();
+    int time_step = fModel->getDT();
+    
+    for (int si=0; si<num_step; si++) {
+        
+        fModel->constructElementMPTable();
+        
+        
+        
+        
+    }
+    
+}
