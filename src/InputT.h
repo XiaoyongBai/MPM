@@ -29,6 +29,10 @@ public:
     unordered_map<int, string>* getMatNameTable(void){return &fMatNames;};
     unordered_map<int, vector<double>>* getMatParaTable(void){return &fMatConstants;};
     
+    
+    vector<double> getBKG_range(void){return fBKG_range;};
+    double getESize(void){return fESIZE;};
+    
     vector<vector<int>> getElementConstants(void){return fElementConstants;};
     vector<int*> getIENs(void){return fIENs;};
     vector<vector<double>> getNodes(void){return fNodes;};
@@ -46,6 +50,10 @@ private:
     unordered_map<int, string> fMatNames;
     unordered_map<int, vector<double>> fMatConstants;
 
+    /* Background mesh range */
+    vector<double> fBKG_range;
+    double fESIZE;
+    
     /*Elements for material points*/
     
     int fNumGroup; //number of element groups

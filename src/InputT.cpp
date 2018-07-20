@@ -14,6 +14,8 @@ InputT::InputT()
 {
 	fNumStep=1;
 	fDT=0;
+    
+    fBKG_range=vector<double>(6, 0.0);
 }
 
 InputT::~InputT()
@@ -65,7 +67,14 @@ void InputT::ReadInput(const char* fileName)
         }
     }
     
-
+    /* read background mesh range */
+    double x_left, x_right, y_left, y_right, z_left, z_right;
+    double esize; //length of element
+    fin >>x_left>>x_right>>y_left>>y_right>>z_left>>z_right>>esize;
+    
+    fBKG_range={x_left,x_right,y_left,y_right,z_left,z_right};
+    fESIZE=esize;
+    
     /* read Element groups */
     fin >> fNumGroup;
     

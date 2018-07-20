@@ -22,6 +22,7 @@ public:
     int getNumPara(void){return fNumPara;}; //get the number of parameters
     
     virtual void setParameters(vector<double>& para) = 0;
+    virtual vector<double> getParameters(void)=0;
     
     virtual double getDensity(void)=0;
     

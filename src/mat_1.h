@@ -22,6 +22,7 @@ public:
     double getDensity(void){return fDensity;};
     
     void setParameters(vector<double>& para);
+    vector<double> getParameters(void);
     
     void updateStress(vector<double>& strain);
     

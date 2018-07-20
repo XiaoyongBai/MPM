@@ -29,11 +29,14 @@ void ModelManagerT::readInput(const char* name)
     /* set up materials */
     constructMaterialTable();
     
+    /* set up background mesh */
+    generateBackgroundMesh();
+    
     /* set up nodes */
     fNodes_mp=fInput.getNodes();
     
     /* generate material points */
-    generateMPM();
+    generateMPs();
 
     
     fInput.~InputT();
@@ -77,8 +80,87 @@ void ModelManagerT::constructMaterialTable(){
 }
 
 
+void ModelManagerT::generateBackgroundMesh(){
+    
+    vector<double> range = fInput.getBKG_range();
+    double esize = fInput.getESize();
+    
+    
+    generateBackgroundMesh(range, esize);
+}
 
-void ModelManagerT::generateMPM(){
+
+void ModelManagerT::generateBackgroundMesh(vector<double> range, double esize){
+    
+    fIEN_bkg.clear();
+    fNodes_bkg.clear();
+    
+    double x_left=range[0];
+    double x_right=range[1];
+    double y_left=range[0];
+    double y_right=range[1];
+    double z_left=range[0];
+    double z_right=range[1];
+    
+    double x_length=x_right-x_left;
+    double y_length=y_right-y_left;
+    double z_length=z_right-z_left;
+    
+    int nel_x = ceil(x_length/esize);
+    int nel_y = ceil(y_length/esize);
+    int nel_z = ceil(z_length/esize);
+    
+    int nnd_x = nel_x+1;
+    int nnd_y = nel_y+1;
+    int nnd_z = nel_z+1;
+    
+    double inc_x = x_length/(nel_x+0.0);
+    double inc_y = y_length/(nel_y+0.0);
+    double inc_z = z_length/(nel_z+0.0);
+    
+    //generate nodes
+    for (int zi=0; zi<nnd_z; zi++) {
+        double z = zi*inc_z;
+        
+        for (int yi=0; yi<nnd_y; yi++) {
+            double y = yi*inc_y;
+            
+            for (int xi=0; xi<nnd_x; xi++) {
+                double x = xi*inc_x;
+                
+                fNodes_bkg.push_back({x,y,z});
+            }
+        }
+    }
+    
+    //generate elements
+    int nnd_layer = nnd_x*nnd_y;
+    
+    for (int zi=0; zi<nel_z; zi++) {
+        int z_offset = zi*nnd_layer;
+        
+        for (int yi=0; yi<nel_y; yi++) {
+            int y_offset = yi*nnd_x;
+            
+            for (int xi=0; xi<nel_x; xi++) {
+                
+                int id=z_offset+y_offset+xi;
+                
+                fIEN_bkg.push_back({id, id+1, id+1+nnd_x, id+nnd_x,
+                    id+nnd_layer, id+1+nnd_layer, id+1+nnd_x+nnd_layer, id+nnd_x+nnd_layer});
+            }
+        }
+        
+    }
+    
+    cout << "num element=" << fIEN_bkg.size() << endl;
+    
+
+}
+
+
+
+void ModelManagerT::generateMPs(){
     
     fElementConstants_mp = fInput.getElementConstants();
     fIENs_mp = fInput.getIENs();
@@ -111,6 +193,25 @@ void ModelManagerT::generateMPM(){
             element->setNodeCoord(eleCoords);
             
             vector<vector<double>> mp = element->generateMatPoints(nmp);
+            
+            
+            //loop over material points
+            for (int mi=0; mi<mp.size(); mi++) {
+                vector<double> mp_coord (3,0.0);
+                for (int di=0; di<3; di++) mp_coord[di]=mp[mi][di];
+                double v=mp[mi][3];
+                MaterialBaseT* material = fMatTables[mat_id];
+                double density = material->getDensity();
+                double mass=v*density;
+                
+                MaterialPointT* point = new MaterialPointT;
+                point->setMaterial(material);
+                point->setMass(mass);
+                point->setCoord(mp_coord);
+                
+                fMatPts.push_back(point);
+            }
+            
             
         }
         

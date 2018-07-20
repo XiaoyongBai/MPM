@@ -36,6 +36,18 @@ void mat_1::setParameters(vector<double>& para){
     fCs=pow(fMu/fDensity, 0.5);
 }
 
+vector<double> mat_1::getParameters(){
+    vector<double> result(3, 0.0);
+    result[0]=fE;
+    result[1]=fNu;
+    result[2]=fDensity;
+    
+    return result;
+}
+
+
+
+
 // strain={e_11, e_22, e_33, 2*e_23, 2*e_13, 2*e_12};
 // stress={s_11, s_22, s_33, s_23, s_13, s_12};
 //s_ij=Lambda*e_kk*delta_ij+2*Mu*e_ij

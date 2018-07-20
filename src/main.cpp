@@ -50,5 +50,5 @@ void recordTime(){
     
     now= time(0);
     char* curr_time = ctime(&now);
-    cout << "The MPM starts at: " << curr_time << endl;
+    cout << "\n  Time is: " << curr_time << endl;
 }
