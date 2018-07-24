@@ -20,6 +20,8 @@ public:
     
     void drive(void);
     
+    void AssembleVector(vector<double>& gv, vector<double>* ev, int eid);
+    
 private:
     
     ModelManagerT* fModel;
@@ -29,6 +31,13 @@ private:
     /* infos of background mesh */
     vector<vector<int>>* fIEN;
     vector<vector<vector<double>>>* fElementCoord;
+    
+    /* global vectors */
+    vector<double> fMass;
+    vector<double> fVelo; //grid velocity
+    vector<double> fAcce; //grid acceleration
+    
+    vector<double> fForce; //force vector
     
 };
     

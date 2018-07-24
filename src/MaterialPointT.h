@@ -23,7 +23,7 @@ namespace MPM {
         double getMass(void){return fMass;}; //get the mass the point
         
         vector<double> getCoord(void){return fCoord;};
-        
+        vector<double> getVelo(void){return fVel;};
         
         void setMaterial(MaterialBaseT* mat);
         

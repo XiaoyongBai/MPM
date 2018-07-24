@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "HexShape8node.h"
 
@@ -15,6 +16,7 @@ HexShape8node::HexShape8node(){
 
     fN=vector<double>(fNND, 0.0);
     fDN=vector<vector<double>>(fNND, vector<double>(3,0.0));
+    fdNx=vector<vector<double>>(fNND, vector<double>(3,0.0));
     
     fX=vector<double>(3,0.0);
     
@@ -103,7 +105,30 @@ void HexShape8node::evaluate(vector<double> &xi){
       +dx_dxi[0][2]*dx_dxi[1][0]*dx_dxi[2][1]-dx_dxi[0][2]*dx_dxi[1][1]*dx_dxi[2][0]
       -dx_dxi[0][1]*dx_dxi[1][0]*dx_dxi[2][2]-dx_dxi[0][0]*dx_dxi[1][2]*dx_dxi[2][1];
     
+    if(fJ<0) throw "\n !!HexShape8node::evaluate, negative Jacobian !! \n";
     
+    //compute the derivative w.r.t x (the physical coordinate)
+    vector<vector<double>> dxi_dx(3, vector<double>(3, 0.0)); //inverse of dx_dxi
+
+    dxi_dx[0][0] =  (dx_dxi[1][1]*dx_dxi[2][2]-dx_dxi[2][1]*dx_dxi[1][2])/fJ;
+    dxi_dx[0][1] = -(dx_dxi[0][1]*dx_dxi[2][2]-dx_dxi[0][2]*dx_dxi[2][1])/fJ;
+    dxi_dx[0][2] =  (dx_dxi[0][1]*dx_dxi[1][2]-dx_dxi[0][2]*dx_dxi[1][1])/fJ;
+    dxi_dx[1][0] = -(dx_dxi[1][0]*dx_dxi[2][2]-dx_dxi[1][2]*dx_dxi[2][0])/fJ;
+    dxi_dx[1][1] =  (dx_dxi[0][0]*dx_dxi[2][2]-dx_dxi[0][2]*dx_dxi[2][0])/fJ;
+    dxi_dx[1][2] = -(dx_dxi[0][0]*dx_dxi[1][2]-dx_dxi[1][0]*dx_dxi[0][2])/fJ;
+    dxi_dx[2][0] =  (dx_dxi[1][0]*dx_dxi[2][1]-dx_dxi[2][0]*dx_dxi[1][1])/fJ;
+    dxi_dx[2][1] = -(dx_dxi[0][0]*dx_dxi[2][1]-dx_dxi[2][0]*dx_dxi[0][1])/fJ;
+    dxi_dx[2][2] =  (dx_dxi[0][0]*dx_dxi[1][1]-dx_dxi[1][0]*dx_dxi[0][1])/fJ;
+    
+    
+    for (int n=0; n<fNND; n++) {
+        for (int di=0; di<3; di++) {
+            fdNx[n][di]=0.0;
+            for (int dj=0; dj<3; dj++) {
+                fdNx[n][di]+=fDN[n][dj]*dxi_dx[dj][di];
+            }
+        }
+    }
     
 }
 

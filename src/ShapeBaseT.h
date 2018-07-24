@@ -26,6 +26,8 @@ public:
     //evaluate shape values and its derivatives
     virtual void evaluate(vector<double>& xi)=0;
 
+    vector<double>* getN(void){return &fN;};
+    
     vector<double> getX(void){return fX;};
     double getJ(void){return fJ;};
     
@@ -42,6 +44,7 @@ protected:
     
     vector<double> fN; //value of the shape functions
     vector<vector<double>> fDN; //Derivative of N w.r.t xi (shape coord)
+    vector<vector<double>> fdNx; //Derivative of N w.r.t x(physical coord)
     
     vector<double> fX; //coordinate of the point under evaluation
     double fJ; //Jacobian at the point

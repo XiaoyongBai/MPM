@@ -19,6 +19,7 @@ SolidElementMPM::SolidElementMPM(int type){
     
     int ennd = fShape->getENND();
     fMassMatrix = vector<double>(3*ennd, 0.0);
+    fConvecVelo = vector<double>(3*ennd, 0.0);
     fForce = vector<double>(3*ennd, 0.0);
     
 }
@@ -84,14 +85,16 @@ void SolidElementMPM::setMaterialPoints(vector<MPM::MaterialPointT *> *mp, vecto
 
 
 
-void SolidElementMPM::compute(){
+void SolidElementMPM::computeMassVelo(){
     
     for (int i=0; i<fMassMatrix.size(); i++) {
         fMassMatrix[i]=0;
+        fConvecVelo[i]=0;
         fForce[i]=0;
     }
     
     int nmp = fMP_index.size();
+    int ennd = fShape->getENND();
     
     if (nmp==0) return;
     
@@ -104,8 +107,22 @@ void SolidElementMPM::compute(){
         
         MaterialPointT* mp = fMP->at(fMP_index[mi]); //pointer to the material point
         double ms = mp->getMass(); //mass of the material point
+        vector<double> vel = mp->getVelo(); //velocity of the material point
+        
         
         fShape->evaluate(fMP_ShapeCoord[mi]);
+        
+        vector<double>* N = fShape->getN();
+        
+        
+        for (int ni=0; ni<ennd; ni++) {
+            double temp_mass = ms*N->at(ni);
+            
+            for (int di=0; di<3; di++) {
+                fMassMatrix[ni*3+di] += temp_mass; //compute mass
+                fConvecVelo[ni*3+di] += temp_mass*vel[di]; //compute convective velocity
+            }
+        }
         
         
     }
@@ -140,6 +157,20 @@ void SolidElementMPM::computeMPShapeCoord(){
         
         fMP_ShapeCoord.push_back({xi_1,xi_2,xi_3});
     }
+    
+    
+}
+
+
+
+void SolidElementMPM::computeForce(double dt){
+    
+    //For B-matrix
+    int ennd = fShape->getENND();
+    
+    vector<vector<double>> B(6, vector<double>(ennd*3,0.0));
+    
+    
     
     
 }

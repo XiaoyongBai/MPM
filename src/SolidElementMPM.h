@@ -31,7 +31,8 @@ public:
     //compute the shape coordinates of the material point
     void computeMPShapeCoord(void);
  
-    void compute(void);
+    void computeMassVelo(void);
+    void computeForce(double dt);
     
 };
     
