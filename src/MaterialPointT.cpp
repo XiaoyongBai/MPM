@@ -27,5 +27,22 @@ void MaterialPointT::setMaterial(MaterialBaseT *mat){
     
 }
 
+void MaterialPointT::updateCoord(double dt){
+    
+    for (int i=0; i<3; i++) {
+        fCoord[i] += fVel[i]*dt;
+    }
+    
+}
 
+vector<double> MaterialPointT::getDisplacement(){
+    
+    vector<double> dis(3,0);
+    for (int i=0; i<3; i++) {
+        dis[i]=fCoord[i]-fInitCoord[i];
+    }
+    
+    return dis;
+    
+}
 

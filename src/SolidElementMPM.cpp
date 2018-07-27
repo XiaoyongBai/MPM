@@ -109,11 +109,9 @@ void SolidElementMPM::computeMassVelo(){
         double ms = mp->getMass(); //mass of the material point
         vector<double> vel = mp->getVelo(); //velocity of the material point
         
-        
         fShape->evaluate(fMP_ShapeCoord[mi]);
         
         vector<double>* N = fShape->getN();
-        
         
         for (int ni=0; ni<ennd; ni++) {
             double temp_mass = ms*N->at(ni);
@@ -165,10 +163,88 @@ void SolidElementMPM::computeMPShapeCoord(){
 
 void SolidElementMPM::computeForce(double dt){
     
-    //For B-matrix
+    //clear force vector
+    for (int i=0; i<fForce.size(); i++) {
+        fForce[i]=0;
+    }
+    
     int ennd = fShape->getENND();
+    int nmp = fMP_index.size(); //number of material points
+    
+    if (nmp==0) return;
+
     
     vector<vector<double>> B(6, vector<double>(ennd*3,0.0));
+    vector<double> D(6, 0.0); //strain rate
+    
+    computeMPShapeCoord();
+    
+    fShape->setCoord(&fNodeCoord);
+    
+    //loop over material points
+    for (int mi=0; mi<nmp; mi++) {
+        
+        MaterialPointT* mp = fMP->at(fMP_index[mi]);
+        fShape->evaluate(fMP_ShapeCoord[mi]);
+        
+        vector<double>* N=fShape->getN();
+        vector<vector<double>>* dNx=fShape->getdNx();
+        
+        //Form B-matrix
+        for (int ni=0; ni<ennd; ni++) {
+            B[0][ni*3+0]=dNx->at(ni)[0];
+            B[1][ni*3+1]=dNx->at(ni)[1];
+            B[2][ni*3+2]=dNx->at(ni)[2];
+            B[3][ni*3+1]=dNx->at(ni)[2];
+            B[3][ni*3+2]=dNx->at(ni)[1];
+            B[4][ni*3+0]=dNx->at(ni)[2];
+            B[4][ni*3+2]=dNx->at(ni)[0];
+            B[5][ni*3+0]=dNx->at(ni)[1];
+            B[5][ni*3+1]=dNx->at(ni)[0];
+        }
+        
+        //compute D*dt
+        for (int i=0; i<6; i++){
+            D[i]=0;
+
+            for (int j=0; j<3*ennd; j++) {
+                D[i]+=B[i][j]*fNodeVelo[j]*dt;
+            }
+        }
+        
+        //update stress at the material point
+        MaterialBaseT* mat = mp->getMaterial();
+        mat->updateStress(D);
+        
+        double mass=mp->getMass();
+        double density=mat->getDensity();
+        vector<double>* stress=mat->getCauchyStress();
+        
+        //compute force vector
+        for (int i=0; i<fForce.size(); i++) {
+            for (int j=0; j<6; j++) {
+                fForce[i]+=B[j][i]*stress->at(j)*mass/density;
+            }
+        }
+        
+        //update velocity and coordinate of material point
+        vector<double> vel(3,0.0);
+        for (int ni=0; ni<ennd; ni++) {
+            for (int di=0; di<3; di++) {
+                vel[di]+=fNodeVelo[ni*3+di]*N->at(ni);
+            }
+        }
+        
+        mp->setVelocity(vel);
+        mp->updateCoord(dt);
+        
+    }
+    
+    for (int di=0; di<fForce.size(); di++) {
+        fForce[di] *= -1.0;
+    }
+
+    
     
     
     

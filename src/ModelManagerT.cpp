@@ -215,6 +215,7 @@ void ModelManagerT::generateMPs(){
                 point->setMaterial(material);
                 point->setMass(mass);
                 point->setCoord(mp_coord);
+                point->setInitCoord(mp_coord);
                 
                 fMatPts.push_back(point);
             }

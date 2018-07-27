@@ -27,6 +27,7 @@ public:
     virtual void evaluate(vector<double>& xi)=0;
 
     vector<double>* getN(void){return &fN;};
+    vector<vector<double>>* getdNx(void){return &fdNx;};
     
     vector<double> getX(void){return fX;};
     double getJ(void){return fJ;};

@@ -21,62 +21,93 @@ ExplicitTransient::ExplicitTransient(ModelManagerT* model){
     fVelo=vector<double>(ndof, 0.0);
     fAcce=vector<double>(ndof, 0.0);
     fForce=vector<double>(ndof, 0.0);
-    
 }
+
 
 ExplicitTransient::~ExplicitTransient(){
     
 }
 
+
 void ExplicitTransient::drive(){
-    
     
     int ndof=fMass.size();
     
-    //clear the global vectors
-    for (int i=0; i<ndof; i++) {
-        fMass[i]=0;
-        fVelo[i]=0;
-        fForce[i]=0;
-    }
-    
     int num_step = fModel->getNumStep();
-    int time_step = fModel->getDT();
+    double time_step = fModel->getDT();
+    int nel=fIEN->size();
+    int ennd=fIEN->at(0).size();
     
     vector<vector<int>>* table = fModel->getElementMP_table();
     vector<MaterialPointT*>* MP = fModel->getMatPts();
     
+    //initialize force vectors
+    for (int i=0; i<ndof; i++) fForce[i]=0;
+
+    for (int i=100; i<125; i++) {
+        fForce[i*3+2]=1;
+    }
+    
+    fModel->constructElementMPTable();
+    
+    //loop over element to initialize mass and convective velocity
+    
+    for (int i=0; i<ndof; i++) {
+        fMass[i]=0;
+        fVelo[i]=0;
+    }
+    
+    for (int ei=0; ei<nel; ei++) {
+        
+        fElement->setNodeCoord(fElementCoord->at(ei));
+        fElement->setMaterialPoints(MP, table->at(ei));
+        
+        fElement->computeMassVelo();
+        
+        vector<double>* mass = fElement->getMassMatrix();
+        vector<double>* velo = fElement->getConvecVelo();
+        
+        AssembleVector(fMass, mass, ei);
+        AssembleVector(fVelo, velo, ei);
+    }
+
+    //adjust convective velocity
+    for (int di=0; di<ndof; di++) {
+        if (fMass[di]>0) fVelo[di] /= fMass[di];
+    }
+    
+    
+    //time stepping
     for (int si=0; si<num_step; si++) {
         
-        fModel->constructElementMPTable();
-        
-        //loop over element to form mass and convective velocity
-        for (int ei=0; ei<fIEN->size(); ei++) {
-            
-            fElement->setNodeCoord(fElementCoord->at(ei));
-            
-            fElement->setMaterialPoints(MP, table->at(ei));
-            
-            fElement->computeMassVelo();
-            
-            vector<double>* mass = fElement->getMassMatrix();
-            vector<double>* velo = fElement->getConvecVelo();
-            
-            AssembleVector(fMass, mass, ei);
-            AssembleVector(fVelo, velo, ei);
-            
+        //compute acceleration
+        for (int di=0; di<fAcce.size(); di++) {
+            if (fMass[di]>0) fAcce[di]=fForce[di]/fMass[di];
         }
         
-        //adjust and update convective velocity
+        //update convective velocity
         for (int di=0; di<ndof; di++) {
             if (fMass[di]>0) {
-                fVelo[di] /= fMass[di];
-                fVelo[di] += fAcce[di];
+                fVelo[di] += fAcce[di]*time_step;
             }
         }
         
-        //loop over elements to form force vector
-        int ennd=fIEN->at(0).size();
+        //velocity boundary condition on background mesh
+        for (int i=0; i<25*3; i++) {
+            fVelo[i]=0;
+        }
+        
+        //clear force vector
+        for (int i=0; i<ndof; i++) {
+            fForce[i]=0;
+        }
+        
+        //body force and tractions
+        for (int i=100; i<125; i++) {
+            fForce[i*3+2]=1;
+        }
+        
+        //loop over elements to form internal force vector
         vector<double> node_v(ennd*3, 0.0);//node velocity
         
         for (int ei=0; ei<fIEN->size(); ei++) {
@@ -89,11 +120,34 @@ void ExplicitTransient::drive(){
                 }
             }
             
+            //node_v={1,0,0,1,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+            
             fElement->setNodeCoord(fElementCoord->at(ei));
             fElement->setNodeVelo(node_v);
             fElement->setMaterialPoints(MP, table->at(ei));
             
+            fElement->computeForce(time_step);
             
+            vector<double>* force = fElement->getForce();
+            
+            AssembleVector(fForce, force, ei);
+            
+        }
+        
+        
+        //compute nodal mass and convective velocity
+        
+        for (int i=0; i<ndof; i++) {
+            fMass[i]=0;
+            fVelo[i]=0;
+        }
+        
+        fModel->constructElementMPTable();
+        
+        for (int ei=0; ei<nel; ei++) {
+            
+            fElement->setNodeCoord(fElementCoord->at(ei));
+            fElement->setMaterialPoints(MP, table->at(ei));
             
             fElement->computeMassVelo();
             
@@ -102,14 +156,18 @@ void ExplicitTransient::drive(){
             
             AssembleVector(fMass, mass, ei);
             AssembleVector(fVelo, velo, ei);
-            
         }
         
+        //adjust convective velocity
+        for (int di=0; di<ndof; di++) {
+            if (fMass[di]>0) fVelo[di] /= fMass[di];
+        }
+        
+        vector<double> dis = MP->at(3999)->getDisplacement();
+        cout << "step=" << si << ", dis_z="<<dis[2]<< ", fForce is=" << fForce[2] << endl;
     }
     
 }
-
-
 
 
 void ExplicitTransient::AssembleVector(vector<double>& gv, vector<double>* ev, int eid){
