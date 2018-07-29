@@ -1,5 +1,12 @@
 /* created by Xiaoyong Bai at CU Boulder, 07/19/2018 */
 
+#include <fstream>
+#include <iomanip>
+
+#include <string>
+#include <sstream>
+#include <iostream>
+
 #include "ExplicitTransient.h"
 
 using namespace std;
@@ -30,6 +37,9 @@ ExplicitTransient::~ExplicitTransient(){
 
 
 void ExplicitTransient::drive(){
+    
+    //record the initial step
+    VTKfile_output(0);
     
     int ndof=fMass.size();
     
@@ -165,6 +175,9 @@ void ExplicitTransient::drive(){
         
         vector<double> dis = MP->at(3999)->getDisplacement();
         cout << "step=" << si << ", dis_z="<<dis[2]<< ", fForce is=" << fForce[2] << endl;
+        
+        
+        VTKfile_output(si+1);
     }
     
 }
@@ -182,5 +195,71 @@ void ExplicitTransient::AssembleVector(vector<double>& gv, vector<double>* ev, i
         }
         
     }
+    
+}
+
+
+void ExplicitTransient::VTKfile_output(int step){
+    
+    //get model info
+    vector<MaterialPointT*>* MP = fModel->getMatPts();
+    int nmp = MP->size();
+    
+    string filename="MPM_result_";
+    
+    ostringstream oo;
+    oo<<step;
+    filename+=oo.str();
+    
+    filename+=".vtk";
+    
+    const char* name=filename.c_str();
+    
+    ofstream myfile;
+    
+    myfile.open(name, fstream::out|fstream::trunc);
+    
+    // write the Head
+    myfile<<"# vtk DataFile Version 3.0 " << endl;
+    myfile<<"Boundary element result"<<endl;
+    myfile<<"ASCII"<<endl;
+    myfile<<"DATASET UNSTRUCTURED_GRID " <<endl;
+    myfile<<"POINTS " << nmp << " float"<<endl;
+    
+    myfile<<setprecision(6);
+    
+    for(int ni=0; ni<nmp; ni++)
+    {
+        vector<double> coord=MP->at(ni)->getCoord();
+        myfile<<setw(15)<<coord[0]<<setw(15) <<coord[1]<<setw(15)<<coord[2];
+        myfile<<endl;
+    }
+    
+    myfile<<"CELLS  " << nmp << " " << 2*nmp <<endl;
+    
+    for(int ei=0; ei<nmp; ei++)
+    {
+        myfile<<setw(5)<<1<<" "<<setw(5)<<ei<<endl ;
+    }
+    
+    myfile<<"CELL_TYPES "<<nmp<<endl;
+    for(int ei=0; ei<nmp; ei++)
+    {
+        myfile<<1<<endl;
+    }
+    
+    
+    
+    myfile<<"POINT_DATA " << nmp << endl;
+    myfile<<"VECTORS " << "Displacement " << "double"<<endl;
+    for(int ni=0; ni<nmp; ni++)
+    {
+        vector<double> dis=MP->at(ni)->getDisplacement();
+        myfile<< setw(15)<< dis[0] <<setw(15) <<dis[1]<<setw(15) <<dis[2]<<endl;
+    }
+    
+    
+    myfile.close();
+    
     
 }

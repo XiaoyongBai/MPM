@@ -22,6 +22,8 @@ public:
     
     void AssembleVector(vector<double>& gv, vector<double>* ev, int eid);
     
+    void VTKfile_output(int step);
+    
 private:
     
     ModelManagerT* fModel;
